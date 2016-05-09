@@ -157,11 +157,11 @@ public extension UIView {
    */
   public enum AnimationDuration: Double {
     /// 0.3s, quick animation.
-    case Short = 0.3
+    case short = 0.3
     /// 0.6s, twice as long as the `Short` duration.
-    case Medium = 0.6
+    case medium = 0.6
     /// 0.9s, three times as long as the `Short` duration.
-    case Long = 0.9
+    case long = 0.9
   }
 
   // MARK: Hiding
@@ -177,7 +177,7 @@ public extension UIView {
    - parameter completion: Call back when the view has been hid or unhid. `nil` by default.
    */
   public func setHidden(hide: Bool, animated: Bool,
-                        duration: Double = AnimationDuration.Short.rawValue,
+                        duration: Double = AnimationDuration.short.rawValue,
                         effect: UIVisualEffect? = nil, completion: ((Bool) -> Void)! = nil) {
     if animated {
       if hide {

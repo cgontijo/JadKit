@@ -10,6 +10,7 @@
 		0502844F1B1960C0007167E8 /* JadKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 0502844E1B1960C0007167E8 /* JadKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		050284551B1960C0007167E8 /* JadKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 050284491B1960C0007167E8 /* JadKit.framework */; };
 		0502845C1B1960C0007167E8 /* JadKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0502845B1B1960C0007167E8 /* JadKitTests.swift */; };
+		0512FB071CDFED2A007E30BB /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0512FB061CDFED2A007E30BB /* Color.swift */; };
 		052AF6031B63ED5B0039DFA1 /* NonFetchedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052AF6021B63ED5B0039DFA1 /* NonFetchedList.swift */; };
 		054F27AD1B7FB5DB0084261B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054F27AC1B7FB5DB0084261B /* ViewController.swift */; };
 		054FBA841C8B86C8003C5A83 /* FetchedListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054FBA831C8B86C8003C5A83 /* FetchedListTests.swift */; };
@@ -44,6 +45,7 @@
 		050284541B1960C0007167E8 /* JadKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JadKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0502845A1B1960C0007167E8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0502845B1B1960C0007167E8 /* JadKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JadKitTests.swift; sourceTree = "<group>"; };
+		0512FB061CDFED2A007E30BB /* Color.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		052AF6021B63ED5B0039DFA1 /* NonFetchedList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NonFetchedList.swift; sourceTree = "<group>"; };
 		054F27AC1B7FB5DB0084261B /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		054FBA831C8B86C8003C5A83 /* FetchedListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedListTests.swift; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 			children = (
 				0567E01A1B54C30A00C04CF3 /* Size.swift */,
 				0567E01B1B54C30A00C04CF3 /* View.swift */,
+				0512FB061CDFED2A007E30BB /* Color.swift */,
 				054F27AC1B7FB5DB0084261B /* ViewController.swift */,
 				05C805281BC4910900295AB1 /* Date.swift */,
 			);
@@ -297,6 +300,7 @@
 				0567E0201B54C30A00C04CF3 /* Size.swift in Sources */,
 				0567E0211B54C30A00C04CF3 /* View.swift in Sources */,
 				055135AB1BF7D890000098F9 /* PaddedLabel.swift in Sources */,
+				0512FB071CDFED2A007E30BB /* Color.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -43,23 +43,23 @@ import CoreData
  conforming object will need to create in order to properly calculate the
  list data.
  */
-public protocol FetchedList: List, NSFetchedResultsControllerDelegate {
+public protocol FetchedList: List, NSFetchedResultsControllerDelegate  {
   /// The fetched results controller that will be used to populate the list
   /// dynamically as the backing store is updated.
-  var fetchedResultsController: NSFetchedResultsController! { get set }
+  var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>! { get set }
 }
 
 /**
  Protocol extension to implement the basic fetched list methods.
  */
-public extension FetchedList {
+public extension FetchedList where Object == NSFetchRequestResult {
   /// The number of sections fetched by the `fetchedResultsController`.
-  var numberOfSections: Int {
+  var sectionCount: Int {
     return fetchedResultsController?.sections?.count ?? 0
   }
 
   /// The index titles for the fetched list.
-  var sectionIndexTitles: [AnyObject]? {
+  var sectionIndexTitles: [String]? {
     return fetchedResultsController?.sectionIndexTitles
   }
 
@@ -69,7 +69,7 @@ public extension FetchedList {
    - returns: The number of rows in a given section. `0` if the section is
    not found.
    */
-  func numberOfRowsInSection(section: Int) -> Int {
+  func itemCount(at section: Int) -> Int {
     if let sections = fetchedResultsController?.sections {
       return sections[section].numberOfObjects
     }
@@ -83,11 +83,11 @@ public extension FetchedList {
    - parameter indexPath: The index path to check for existance.
    - returns: `true` iff the index path is valid for your data source.
    */
-  func isValidIndexPath(indexPath: NSIndexPath) -> Bool {
-    guard indexPath.section < numberOfSections && indexPath.section >= 0 else {
+  func isValidIndexPath(_ indexPath: IndexPath) -> Bool {
+    guard indexPath.section < sectionCount && indexPath.section >= 0 else {
       return false
     }
-    return indexPath.row < numberOfRowsInSection(indexPath.section) && indexPath.row >= 0
+    return indexPath.row < itemCount(at: indexPath.section) && indexPath.row >= 0
   }
 
   /**
@@ -99,11 +99,11 @@ public extension FetchedList {
    - returns: An optional with the corresponding object at an index
    path or nil if the index path is invalid.
    */
-  func objectAtIndexPath(indexPath: NSIndexPath) -> AnyObject? {
+  func object(at indexPath: IndexPath) -> Object? {
     guard isValidIndexPath(indexPath) else {
       return nil
     }
-    return fetchedResultsController?.objectAtIndexPath(indexPath)
+    return fetchedResultsController?.object(at: indexPath)
   }
 
   /**
@@ -111,8 +111,8 @@ public extension FetchedList {
    - parameter section: The section for the header's title to grab.
    - returns: The header title for the section or `nil` if none is found.
    */
-  func titleForHeaderInSection(section: Int) -> String? {
-    guard isValidIndexPath(NSIndexPath(forRow: 0, inSection: section)) else {
+  func titleForHeader(at section: Int) -> String? {
+    guard isValidIndexPath(IndexPath(row: 0, section: section)) else {
       return nil
     }
     return fetchedResultsController?.sections?[section].name
@@ -135,16 +135,16 @@ public protocol FetchedTableList: FetchedList, UITableViewDataSource, UITableVie
  Protocol extension to implement the table view delegate & data source methods.
  */
 public extension FetchedTableList where ListView == UITableView, Cell == UITableViewCell,
-  Object == AnyObject {
+  Object == NSFetchRequestResult {
     /**
      Method to call in `tableView:cellForRowAtIndexPath:`.
      - parameter indexPath: An index path locating a row in `tableView`
      */
-    func tableCellAtIndexPath(indexPath: NSIndexPath) -> UITableViewCell {
-      let identifier = cellIdentifierForIndexPath(indexPath)
-      let cell = tableView.dequeueReusableCellWithIdentifier(identifier, forIndexPath: indexPath)
+    func cell(at indexPath: IndexPath) -> UITableViewCell {
+      let identifier = cellIdentifier(at: indexPath)
+      let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
 
-      if let object = objectAtIndexPath(indexPath) {
+      if let object = object(at: indexPath) {
         listView(tableView, configureCell: cell, withObject: object, atIndexPath: indexPath)
       }
 
@@ -155,8 +155,8 @@ public extension FetchedTableList where ListView == UITableView, Cell == UITable
      Method to call in `tableView:didSelectRowAtIndexPath:`.
      - parameter indexPath: An index path locating the new selected row in `tableView`.
      */
-    func tableDidSelectItemAtIndexPath(indexPath: NSIndexPath) {
-      if let object = objectAtIndexPath(indexPath) {
+    func didSelectItem(at indexPath: IndexPath) {
+      if let object = object(at: indexPath) {
         listView(tableView, didSelectObject: object, atIndexPath: indexPath)
       }
     }
@@ -167,11 +167,11 @@ public extension FetchedTableList where ListView == UITableView, Cell == UITable
  sdelegate methods.
  */
 public extension FetchedTableList where ListView == UITableView, Cell == UITableViewCell,
-  Object == AnyObject {
+  Object == NSFetchRequestResult {
     /**
      Method to call in `controllerWillChangeContent:`.
      */
-    func tableWillChangeContent() {
+    func willChangeContent() {
       tableView.beginUpdates()
     }
 
@@ -181,14 +181,14 @@ public extension FetchedTableList where ListView == UITableView, Cell == UITable
      - parameter type: The type of change (insert or delete). Valid values are
      `NSFetchedResultsChangeInsert` and `NSFetchedResultsChangeDelete`.
      */
-    func tableDidChangeSection(sectionIndex: Int, withChangeType type: NSFetchedResultsChangeType) {
+    func didChangeSection(_ sectionIndex: Int, withChangeType type: NSFetchedResultsChangeType) {
       switch type {
-      case .Insert:
-        tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
-      case .Delete:
-        tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
-      case .Update:
-        tableView.reloadSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
+      case .insert:
+        tableView.insertSections(IndexSet(integer: sectionIndex), with: .automatic)
+      case .delete:
+        tableView.deleteSections(IndexSet(integer: sectionIndex), with: .automatic)
+      case .update:
+        tableView.reloadSections(IndexSet(integer: sectionIndex), with: .automatic)
       default:
         // FIXME: Figure out what to do with .Move
         break
@@ -203,25 +203,24 @@ public extension FetchedTableList where ListView == UITableView, Cell == UITable
      - parameter newIndexPath: The destination path for the object for insertions or moves
      (this value is `nil` for a deletion).
      */
-    func tableDidChangeObjectAtIndexPath(indexPath: NSIndexPath?,
-                                         withChangeType type: NSFetchedResultsChangeType,
-                                         newIndexPath: NSIndexPath?) {
+  func didChangeObject(at indexPath: IndexPath?, withChangeType type: NSFetchedResultsChangeType,
+                      newIndexPath: IndexPath?) {
       switch type {
-      case .Insert:
-        tableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Automatic)
-      case .Delete:
-        tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Automatic)
-      case .Update:
-        tableView.reloadRowsAtIndexPaths([indexPath!], withRowAnimation: .Automatic)
-      case .Move:
-        tableView.moveRowAtIndexPath(indexPath!, toIndexPath: newIndexPath!)
+      case .insert:
+        tableView.insertRows(at: [newIndexPath!], with: .automatic)
+      case .delete:
+        tableView.deleteRows(at: [indexPath!], with: .automatic)
+      case .update:
+        tableView.reloadRows(at: [indexPath!], with: .automatic)
+      case .move:
+        tableView.moveRow(at: indexPath!, to: newIndexPath!)
       }
     }
 
     /**
      Method to call in `controllerDidChangeContent:`
      */
-    func tableDidChangeContent() {
+    func didChangeContent() {
       tableView.endUpdates()
     }
 }
@@ -243,22 +242,22 @@ public protocol FetchedCollectionList: FetchedList, UICollectionViewDataSource,
     /// property. It is an array of block operations used to hold the section
     /// and row changes so that the collection view can be animated in the same
     /// way a table view controller handles section changes.
-    var changeOperations: [NSBlockOperation] { get set }
+    var changeOperations: [BlockOperation] { get set }
 }
 
 /**
  Protocol extension to implement the custom source methods.
  */
 public extension FetchedCollectionList where ListView == UICollectionView,
-  Cell == UICollectionViewCell, Object == AnyObject {
+  Cell == UICollectionViewCell, Object == NSFetchRequestResult {
     /**
      Cancel the queued up collection view row & section changes.
     */
-    func cancelCollectionViewChangeOperations() {
-      for operation: NSBlockOperation in changeOperations {
+    func cancelChangeOperations() {
+      for operation: BlockOperation in changeOperations {
         operation.cancel()
       }
-      changeOperations.removeAll(keepCapacity: false)
+      changeOperations.removeAll(keepingCapacity: false)
     }
 }
 
@@ -267,18 +266,18 @@ public extension FetchedCollectionList where ListView == UICollectionView,
  data source methods.
  */
 public extension FetchedCollectionList where ListView == UICollectionView,
-  Cell == UICollectionViewCell, Object == AnyObject {
+  Cell == UICollectionViewCell, Object == NSFetchRequestResult {
     /**
      Method to call in `collectionView:cellForItemAtIndexPath:`.
      - parameter indexPath: The index path that specifies the location of the item.
      */
-    func collectionCellAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewCell {
-      let identifier = cellIdentifierForIndexPath(indexPath)
+    func cell(at indexPath: IndexPath) -> UICollectionViewCell {
+      let identifier = cellIdentifier(at: indexPath)
 
-      let cell = collectionView!.dequeueReusableCellWithReuseIdentifier(identifier,
-                                                                       forIndexPath: indexPath)
+      let cell = collectionView!.dequeueReusableCell(withReuseIdentifier: identifier,
+                                                                       for: indexPath)
 
-      if let object = objectAtIndexPath(indexPath) {
+      if let object = object(at: indexPath) {
         listView(collectionView!, configureCell: cell, withObject: object, atIndexPath: indexPath)
       }
 
@@ -289,8 +288,8 @@ public extension FetchedCollectionList where ListView == UICollectionView,
      Method to call in `collectionView:didSelectItemAtIndexPath:`.
      - parameter indexPath: The index path of the cell that was selected.
      */
-    func collectionDidSelectItemAtIndexPath(indexPath: NSIndexPath) {
-      if let object = objectAtIndexPath(indexPath) {
+    func didSelectItem(at indexPath: IndexPath) {
+      if let object = object(at: indexPath) {
         listView(collectionView!, didSelectObject: object, atIndexPath: indexPath)
       }
     }
@@ -301,12 +300,12 @@ public extension FetchedCollectionList where ListView == UICollectionView,
  sdelegate methods.
  */
 public extension FetchedCollectionList where ListView == UICollectionView,
-  Cell == UICollectionViewCell, Object == AnyObject {
+  Cell == UICollectionViewCell, Object == NSFetchRequestResult {
     /**
      Method to call in `controllerWillChangeContent:`.
      */
-    func collectionWillChangeContent() {
-      self.changeOperations.removeAll(keepCapacity: false)
+    func willChangeContent() {
+      self.changeOperations.removeAll(keepingCapacity: false)
     }
 
     /**
@@ -315,24 +314,23 @@ public extension FetchedCollectionList where ListView == UICollectionView,
      - parameter type: The type of change (insert or delete). Valid values are
      `NSFetchedResultsChangeInsert` and `NSFetchedResultsChangeDelete`.
      */
-    func collectionDidChangeSection(sectionIndex: Int,
-                                    withChangeType type: NSFetchedResultsChangeType) {
-      let indexSet = NSIndexSet(index: sectionIndex)
+    func didChangeSection(_ sectionIndex: Int, withChangeType type: NSFetchedResultsChangeType) {
+      let indexSet = IndexSet(integer: sectionIndex)
 
       switch type {
-      case .Insert:
+      case .insert:
         changeOperations.append(
-          NSBlockOperation { [weak self] in
+          BlockOperation { [weak self] in
             self?.collectionView!.insertSections(indexSet)
           })
-      case .Update:
+      case .update:
         changeOperations.append(
-          NSBlockOperation { [weak self] in
+          BlockOperation { [weak self] in
             self?.collectionView!.reloadSections(indexSet)
           })
-      case .Delete:
+      case .delete:
         changeOperations.append(
-          NSBlockOperation { [weak self] in
+          BlockOperation { [weak self] in
             self?.collectionView!.deleteSections(indexSet)
           })
       default:
@@ -348,29 +346,28 @@ public extension FetchedCollectionList where ListView == UICollectionView,
      - parameter newIndexPath: The destination path for the object for insertions or moves
      (this value is `nil` for a deletion).
      */
-    func collectionDidChangeObjectAtIndexPath(indexPath: NSIndexPath?,
-                                              withChangeType type: NSFetchedResultsChangeType,
-                                              newIndexPath: NSIndexPath?) {
+    func didChangeObject(at indexPath: IndexPath?, withChangeType type: NSFetchedResultsChangeType,
+                        newIndexPath: IndexPath?) {
       switch type {
-      case .Insert:
+      case .insert:
         changeOperations.append(
-          NSBlockOperation { [weak self] in
-            self?.collectionView!.insertItemsAtIndexPaths([newIndexPath!])
+          BlockOperation { [weak self] in
+            self?.collectionView!.insertItems(at: [newIndexPath!])
           })
-      case .Update:
+      case .update:
         changeOperations.append(
-          NSBlockOperation { [weak self] in
-            self?.collectionView!.reloadItemsAtIndexPaths([indexPath!])
+          BlockOperation { [weak self] in
+            self?.collectionView!.reloadItems(at: [indexPath!])
           })
-      case .Move:
+      case .move:
         changeOperations.append(
-          NSBlockOperation { [weak self] in
-            self?.collectionView!.moveItemAtIndexPath(indexPath!, toIndexPath: newIndexPath!)
+          BlockOperation { [weak self] in
+            self?.collectionView!.moveItem(at: indexPath!, to: newIndexPath!)
           })
-      case .Delete:
+      case .delete:
         changeOperations.append(
-          NSBlockOperation { [weak self] in
-            self?.collectionView!.deleteItemsAtIndexPaths([indexPath!])
+          BlockOperation { [weak self] in
+            self?.collectionView!.deleteItems(at: [indexPath!])
           })
       }
     }
@@ -378,7 +375,7 @@ public extension FetchedCollectionList where ListView == UICollectionView,
     /**
      Method to call in `controllerDidChangeContent:`
      */
-    func collectionDidChangeContent() {
+    func didChangeContent() {
       for section in fetchedResultsController.sections! {
         print(section.numberOfObjects)
       }
@@ -388,7 +385,7 @@ public extension FetchedCollectionList where ListView == UICollectionView,
           operation.start()
         }
       }, completion: { [weak self] finished in
-          self?.changeOperations.removeAll(keepCapacity: false)
+          self?.changeOperations.removeAll(keepingCapacity: false)
       })
     }
 }

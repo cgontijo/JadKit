@@ -21,10 +21,10 @@ class TableListTests: JadKitTests {
   override func setUp() {
     super.setUp()
 
-    tableViewController = TableListViewController(style: .Plain)
+    tableViewController = TableListViewController(style: .plain)
     tableViewController.listData = listData
 
-    tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: testReuseIdentifier)
+    tableView.register(UITableViewCell.self, forCellReuseIdentifier: testReuseIdentifier)
   }
 
   override func tearDown() {
@@ -35,20 +35,20 @@ class TableListTests: JadKitTests {
   }
 
   func testListRowsAndSections() {
-    XCTAssertEqual(tableView.numberOfSections, tableViewController.numberOfSections)
+    XCTAssertEqual(tableView.numberOfSections, tableViewController.sectionCount)
 
     for section in 0..<tableView.numberOfSections {
-      XCTAssertEqual(tableView.numberOfRowsInSection(section),
-        tableViewController.numberOfRowsInSection(section))
+      XCTAssertEqual(tableView.numberOfRows(inSection: section),
+        tableViewController.itemCount(at: section))
     }
   }
 
   func testDequeueCells() {
     // Mimic-ish what a UITableViewController would do
-    for section in 0..<tableViewController.numberOfSectionsInTableView(tableView) {
+    for section in 0..<tableViewController.numberOfSections(in: tableView) {
       for row in 0..<tableViewController.tableView(tableView, numberOfRowsInSection: section) {
         let cell = tableViewController.tableView(tableView,
-          cellForRowAtIndexPath: NSIndexPath(forRow: row, inSection: section))
+          cellForRowAt: IndexPath(row: row, section: section))
         
         // Make sure that through the protocol extensions we didn't mess up the ordering.
         XCTAssertEqual(cell.textLabel!.text, listData[section][row].name)
@@ -58,12 +58,12 @@ class TableListTests: JadKitTests {
 
   func testSelectCells() {
     // Mimic-ish what a UITableViewController would do
-    for section in 0..<tableViewController.numberOfSectionsInTableView(tableView) {
+    for section in 0..<tableViewController.numberOfSections(in: tableView) {
       for row in 0..<tableViewController.tableView(tableView, numberOfRowsInSection: section) {
-        let indexPath = NSIndexPath(forRow: row, inSection: section)
+        let indexPath = IndexPath(row: row, section: section)
 
         XCTAssertFalse(tableViewController.selectedCellIndexPaths.contains(indexPath))
-        tableViewController.tableView(tableView, didSelectRowAtIndexPath: indexPath)
+        tableViewController.tableView(tableView, didSelectRowAt: indexPath)
         XCTAssertTrue(tableViewController.selectedCellIndexPaths.contains(indexPath))
       }
     }
@@ -72,38 +72,38 @@ class TableListTests: JadKitTests {
 
 private class TableListViewController: UITableViewController, TableList {
   var listData: [[TestObject]]!
-  var selectedCellIndexPaths = [NSIndexPath]()
+  var selectedCellIndexPaths = [IndexPath]()
 
-  func cellIdentifierForIndexPath(indexPath: NSIndexPath) -> String {
+  func cellIdentifier(at: IndexPath) -> String {
     return testReuseIdentifier
   }
 
-  func listView(listView: UITableView, configureCell cell: UITableViewCell,
-    withObject object: TestObject, atIndexPath indexPath: NSIndexPath) {
+  func listView(_ listView: UITableView, configureCell cell: UITableViewCell,
+    withObject object: TestObject, atIndexPath indexPath: IndexPath) {
       cell.textLabel?.text = object.name
   }
 
-  func listView(listView: UITableView, didSelectObject object: TestObject,
-    atIndexPath indexPath: NSIndexPath) {
+  func listView(_ listView: UITableView, didSelectObject object: TestObject,
+    atIndexPath indexPath: IndexPath) {
       selectedCellIndexPaths.append(indexPath)
   }
 
   // MARK: Table View
 
-  override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-    return numberOfSections
+  override func numberOfSections(in tableView: UITableView) -> Int {
+    return sectionCount
   }
 
-  override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return numberOfRowsInSection(section)
+  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return itemCount(at: section)
   }
 
-  override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath)
+  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath)
     -> UITableViewCell {
-      return tableCellAtIndexPath(indexPath)
+      return cell(at: indexPath)
   }
 
-  override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-    tableDidSelectItemAtIndexPath(indexPath)
+  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    didSelectItem(at: indexPath)
   }
 }

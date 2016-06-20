@@ -20,65 +20,65 @@ class FetchedListTests: JadKitTests, FetchedList {
   override func setUp() {
     super.setUp()
 
-    insertAndSaveObjects(10, sectionName: "First")
-    insertAndSaveObjects(5, sectionName: "Second")
+    insertAndSave(numberOfObjects: 10, inSectionName: "First")
+    insertAndSave(numberOfObjects: 5, inSectionName: "Second")
 
     performFetch()
   }
 
-  func testNumberOfRowsAndSetions() {
+  func testitemCountAndSetions() {
     if let sections = fetchedResultsController.sections {
-      XCTAssertEqual(numberOfSections, sections.count)
+      XCTAssertEqual(sectionCount, sections.count)
 
       for sectionIndex in 0..<sections.count {
-        XCTAssertEqual(numberOfRowsInSection(sectionIndex), sections[sectionIndex].numberOfObjects)
+        XCTAssertEqual(itemCount(at: sectionIndex), sections[sectionIndex].numberOfObjects)
       }
     }
   }
 
   func testValidIndexPath() {
-    XCTAssertTrue(isValidIndexPath(NSIndexPath(forRow: 0, inSection: 1)))
+    XCTAssertTrue(isValidIndexPath(IndexPath(row: 0, section: 1)))
   }
 
   func testInvalidIndexPath() {
-    XCTAssertFalse(isValidIndexPath(NSIndexPath(forRow: 1, inSection: 10)))
+    XCTAssertFalse(isValidIndexPath(IndexPath(row: 1, section: 10)))
   }
 
   func testObjectAtIndexPathSectionTooBig() {
-    XCTAssertNil(objectAtIndexPath(NSIndexPath(forRow: 0, inSection: 2)))
+    XCTAssertNil(object(at: IndexPath(row: 0, section: 2)))
   }
 
   func testObjectAtIndexPathSectionTooSmall() {
-    XCTAssertNil(objectAtIndexPath(NSIndexPath(forRow: 0, inSection: -1)))
+    XCTAssertNil(object(at: IndexPath(row: 0, section: -1)))
   }
 
   func testObjectAtIndexPathRowTooBig() {
-    XCTAssertNil(objectAtIndexPath(NSIndexPath(forRow: 10, inSection: 0)))
+    XCTAssertNil(object(at: IndexPath(row: 10, section: 0)))
   }
 
   func testObjectAtIndexPathRowTooSmall() {
-    XCTAssertNil(objectAtIndexPath(NSIndexPath(forRow: -1, inSection: 0)))
+    XCTAssertNil(object(at: IndexPath(row: -1, section: 0)))
   }
 
   func testValidSectionNames() {
-    XCTAssertEqual(titleForHeaderInSection(0), "First")
-    XCTAssertEqual(titleForHeaderInSection(1), "Second")
+    XCTAssertEqual(titleForHeader(at: 0), "First")
+    XCTAssertEqual(titleForHeader(at: 1), "Second")
   }
 
   func testInvalidSectionNames() {
-    XCTAssertNil(titleForHeaderInSection(2))
-    XCTAssertNil(titleForHeaderInSection(-2))
+    XCTAssertNil(titleForHeader(at: 2))
+    XCTAssertNil(titleForHeader(at: -2))
   }
 
   // MARK: Conformance
 
-  func cellIdentifierForIndexPath(indexPath: NSIndexPath) -> String {
+  func cellIdentifier(at: IndexPath) -> String {
     return testReuseIdentifier
   }
 
-  func listView(listView: ListView, configureCell cell: Cell, withObject object: Object,
-    atIndexPath indexPath: NSIndexPath) { }
+  func listView(_ listView: ListView, configureCell cell: Cell, withObject object: Object,
+    atIndexPath indexPath: IndexPath) { }
 
-  func listView(listView: ListView, didSelectObject object: Object,
-    atIndexPath indexPath: NSIndexPath) { }
+  func listView(_ listView: ListView, didSelectObject object: Object,
+    atIndexPath indexPath: IndexPath) { }
 }

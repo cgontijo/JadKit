@@ -62,27 +62,27 @@ public class PaddedLabel: UILabel {
                                   bottom: inset.height, right: inset.width) : UIEdgeInsets()
   }
 
-  public override func drawTextInRect(rect: CGRect) {
-    super.drawTextInRect(UIEdgeInsetsInsetRect(rect, padding))
+  public override func drawText(in rect: CGRect) {
+    super.drawText(in: UIEdgeInsetsInsetRect(rect, padding))
   }
 
   // FIXME: This is still not perfect. Spend some time trying to understand it.
-  public override func textRectForBounds(bounds: CGRect, limitedToNumberOfLines numberOfLines: Int)
+  public override func textRect(forBounds bounds: CGRect, limitedToNumberOfLines numberOfLines: Int)
     -> CGRect {
-      var rect = super.textRectForBounds(bounds, limitedToNumberOfLines: numberOfLines)
+      var rect = super.textRect(forBounds: bounds, limitedToNumberOfLines: numberOfLines)
 
       if let text = text {
-        let estimatedWidth = CGRectGetWidth(rect) - (2 * (padding.left + padding.right))
-        let estimatedHeight = CGFloat.max
+        let estimatedWidth = rect.width - (2 * (padding.left + padding.right))
+        let estimatedHeight = CGFloat.greatestFiniteMagnitude
 
         let boundingSize = CGSize(width: estimatedWidth, height: estimatedHeight)
-        let calculatedFrame = text.boundingRectWithSize(boundingSize,
-                                                        options: .UsesLineFragmentOrigin,
+        let calculatedFrame = text.boundingRect(with: boundingSize,
+                                                        options: .usesLineFragmentOrigin,
                                                         attributes: [NSFontAttributeName : font],
                                                         context: nil)
 
-        let calculatedWidth = ceil(CGRectGetWidth(calculatedFrame))
-        let calculatedHeight = ceil(CGRectGetHeight(calculatedFrame))
+        let calculatedWidth = ceil(calculatedFrame.width)
+        let calculatedHeight = ceil(calculatedFrame.height)
 
         // let finalHeight = (calculatedHeight + padding.top + padding.bottom)
         rect.size = CGSize(width: calculatedWidth, height: calculatedHeight)
@@ -100,7 +100,7 @@ public class PaddedLabel: UILabel {
     return CGSize(width: width, height: heigth)
   }
 
-  public override func sizeThatFits(size: CGSize) -> CGSize {
+  public override func sizeThatFits(_ size: CGSize) -> CGSize {
     let superSizeThatFits = super.sizeThatFits(size)
 
     let width = superSizeThatFits.width + padding.left + padding.right

@@ -15,11 +15,11 @@ public extension UIColor {
       return nil
     }
 
-    func intFromHexString(string: String) -> UInt32 {
+    func intFromHexString(_ string: String) -> UInt32 {
       var hextInt: UInt32 = 0
-      let scanner: NSScanner = NSScanner(string: hexString)
-      scanner.charactersToBeSkipped = NSCharacterSet(charactersInString: "#")
-      scanner.scanHexInt(&hextInt)
+      let scanner: Scanner = Scanner(string: hexString)
+      scanner.charactersToBeSkipped = CharacterSet(charactersIn: "#")
+      scanner.scanHexInt32(&hextInt)
       return hextInt
     }
 

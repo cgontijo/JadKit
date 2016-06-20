@@ -22,7 +22,6 @@
 		0567E0211B54C30A00C04CF3 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0567E01B1B54C30A00C04CF3 /* View.swift */; };
 		0567E0221B54C30A00C04CF3 /* List.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0567E01D1B54C30A00C04CF3 /* List.swift */; };
 		0567E0251B54C32000C04CF3 /* FetchedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0567E0241B54C32000C04CF3 /* FetchedList.swift */; };
-		05C805291BC4910900295AB1 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C805281BC4910900295AB1 /* Date.swift */; };
 		05E3E58C1C8A91F9006B9AC1 /* TableListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E3E58A1C8A91F9006B9AC1 /* TableListTests.swift */; };
 		05E3E58F1C8A9364006B9AC1 /* CollectionListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E3E58E1C8A9364006B9AC1 /* CollectionListTests.swift */; };
 		05E3E59C1C8B64B7006B9AC1 /* NonFetchedListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E3E59B1C8B64B7006B9AC1 /* NonFetchedListTests.swift */; };
@@ -57,7 +56,6 @@
 		0567E01B1B54C30A00C04CF3 /* View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		0567E01D1B54C30A00C04CF3 /* List.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = List.swift; sourceTree = "<group>"; };
 		0567E0241B54C32000C04CF3 /* FetchedList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedList.swift; sourceTree = "<group>"; };
-		05C805281BC4910900295AB1 /* Date.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		05E3E58A1C8A91F9006B9AC1 /* TableListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableListTests.swift; sourceTree = "<group>"; };
 		05E3E58E1C8A9364006B9AC1 /* CollectionListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionListTests.swift; sourceTree = "<group>"; };
 		05E3E59B1C8B64B7006B9AC1 /* NonFetchedListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NonFetchedListTests.swift; sourceTree = "<group>"; };
@@ -154,7 +152,6 @@
 				0567E01B1B54C30A00C04CF3 /* View.swift */,
 				0512FB061CDFED2A007E30BB /* Color.swift */,
 				054F27AC1B7FB5DB0084261B /* ViewController.swift */,
-				05C805281BC4910900295AB1 /* Date.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -240,15 +237,17 @@
 			attributes = {
 				LastSwiftMigration = 0700;
 				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Jad Osseiran";
 				TargetAttributes = {
 					050284481B1960C0007167E8 = {
 						CreatedOnToolsVersion = 6.4;
 						DevelopmentTeam = DL393NZ5X7;
+						LastSwiftMigration = 0800;
 					};
 					050284531B1960C0007167E8 = {
 						CreatedOnToolsVersion = 6.4;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -293,7 +292,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0567E0251B54C32000C04CF3 /* FetchedList.swift in Sources */,
-				05C805291BC4910900295AB1 /* Date.swift in Sources */,
 				052AF6031B63ED5B0039DFA1 /* NonFetchedList.swift in Sources */,
 				0567E0221B54C30A00C04CF3 /* List.swift in Sources */,
 				054F27AD1B7FB5DB0084261B /* ViewController.swift in Sources */,
@@ -439,6 +437,7 @@
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -460,6 +459,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -474,6 +475,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jadosseiran.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -484,6 +486,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jadosseiran.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

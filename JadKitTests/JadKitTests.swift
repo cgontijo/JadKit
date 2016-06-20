@@ -15,16 +15,16 @@ let testReuseIdentifier = "Identifier"
 private(set) var testManagedObjectContext: NSManagedObjectContext!
 
 private func setUpCoreData() {
-  let bundles = [NSBundle(forClass: JadKitTests.self)]
-  guard let model = NSManagedObjectModel.mergedModelFromBundles(bundles) else {
+  let bundles = [Bundle(for: JadKitTests.self)]
+  guard let model = NSManagedObjectModel.mergedModel(from: bundles) else {
     fatalError("Model not found")
   }
 
   let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: model)
-  try! persistentStoreCoordinator.addPersistentStoreWithType(NSInMemoryStoreType,
-    configuration: nil, URL: nil, options: nil)
+  try! persistentStoreCoordinator.addPersistentStore(ofType: NSInMemoryStoreType,
+    configurationName: nil, at: nil, options: nil)
 
-  let managedObjectContext = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+  let managedObjectContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
   managedObjectContext.persistentStoreCoordinator = persistentStoreCoordinator
 
   testManagedObjectContext = managedObjectContext
@@ -33,13 +33,12 @@ private func setUpCoreData() {
 private func tearDownCoreData() {
   testManagedObjectContext.reset()
 
-  let fetchRequest = NSFetchRequest(entityName: TestObject.entityName)
+  let fetchRequest = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
 
   do {
-    let fetchedObjects = try testManagedObjectContext.executeFetchRequest(fetchRequest)
-      as! [TestObject]
+    let fetchedObjects = try testManagedObjectContext.fetch(fetchRequest)
     for fetchedObject in fetchedObjects {
-      testManagedObjectContext.deleteObject(fetchedObject)
+      testManagedObjectContext.delete(fetchedObject)
     }
   } catch let error {
     XCTFail("\(error)")
@@ -59,19 +58,19 @@ private func saveCoreData() {
 class JadKitTests: XCTestCase {
   var listData: [[TestObject]]!
 
-  var fetchedResultsController: NSFetchedResultsController!
+  var fetchedResultsController: NSFetchedResultsController<TestObject>!
 
   override func setUp() {
     super.setUp()
 
     setUpCoreData()
 
-    listData = [[TestObject(color: UIColor.blueColor()), TestObject(color: UIColor.whiteColor()),
-      TestObject(color: UIColor.redColor())], [TestObject(color: UIColor.blackColor())]]
+    listData = [[TestObject(color: UIColor.blue()), TestObject(color: UIColor.white()),
+      TestObject(color: UIColor.red())], [TestObject(color: UIColor.black())]]
 
-    let fetchRequest = NSFetchRequest(entityName: TestObject.entityName)
-    fetchRequest.sortDescriptors = [NSSortDescriptor(key: "sectionName", ascending: true)]
-    fetchRequest.predicate = NSPredicate(value: true)
+    let fetchRequest = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
+    fetchRequest.sortDescriptors = [SortDescriptor(key: "sectionName", ascending: true)]
+    fetchRequest.predicate = Predicate(value: true)
 
     fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
       managedObjectContext: testManagedObjectContext, sectionNameKeyPath: "sectionName",
@@ -92,43 +91,42 @@ class JadKitTests: XCTestCase {
     }
   }
 
-  func insertAndSaveObjects(numObjects: Int, sectionName: String) {
+  func insertAndSave(numberOfObjects numObjects: Int, inSectionName sectionName: String) {
     for _ in 0..<numObjects {
       let color: UIColor
       let randomInt = arc4random_uniform(4)
       switch randomInt {
       case 0:
-        color = UIColor.redColor()
+        color = #colorLiteral(red: 0.7540004253, green: 0, blue: 0.2649998069, alpha: 1)
 
       case 1:
-        color = UIColor.blueColor()
+        color = #colorLiteral(red: 0.1603052318, green: 0, blue: 0.8195188642, alpha: 1)
 
       case 2:
-        color = UIColor.greenColor()
+        color = #colorLiteral(red: 0.2818343937, green: 0.5693024397, blue: 0.1281824261, alpha: 1)
 
       default:
         // I love yellow.
-        color = UIColor.yellowColor()
+        color = #colorLiteral(red: 0.9346159697, green: 0.6284804344, blue: 0.1077284366, alpha: 1)
       }
 
-      insertObject(color, sectionName: sectionName)
+      insert(objectWithColor: color, inSectionName: sectionName)
     }
 
     saveCoreData()
   }
 
-  func addAndSaveObject(color: UIColor, sectionName: String) {
-    insertObject(color, sectionName: sectionName)
+  func addAndSave(objectWithColor color: UIColor, inSectionName sectionName: String) {
+    insert(objectWithColor: color, inSectionName: sectionName)
     saveCoreData()
   }
 
-  func updateAndSaveObject(forName name: String, updateClosure: (object: TestObject) -> Void) {
-      let request = NSFetchRequest(entityName: TestObject.entityName)
-      request.predicate = NSPredicate(format: "name == %@", name)
+  func updateAndSave(objectWithName name: String, updateClosure: (object: TestObject) -> Void) {
+      let request = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
+      request.predicate = Predicate(format: "name == %@", name)
 
       do {
-        guard let foundObject = try testManagedObjectContext.executeFetchRequest(request).first
-          as? TestObject else {
+        guard let foundObject = try testManagedObjectContext.fetch(request).first else {
             XCTFail()
             return
         }
@@ -142,24 +140,18 @@ class JadKitTests: XCTestCase {
       }
   }
 
-  func deleteAndSaveObject(object: TestObject) {
-    testManagedObjectContext.deleteObject(object)
+  func deleteAndSave(object: TestObject) {
+    testManagedObjectContext.delete(object)
     saveCoreData()
   }
 
-  func deleteAndSaveSection(sectionName: String) {
-    let request = NSFetchRequest(entityName: TestObject.entityName)
-    request.predicate = NSPredicate(format: "sectionName == %@", sectionName)
+  func deleteAndSave(sectionWithName sectionName: String) {
+    let request = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
+    request.predicate = Predicate(format: "sectionName == %@", sectionName)
 
     do {
-      guard let foundObjects = try testManagedObjectContext.executeFetchRequest(request)
-        as? [TestObject] else {
-          XCTFail()
-          return
-      }
-
-      for foundObject in foundObjects {
-        testManagedObjectContext.deleteObject(foundObject)
+      for foundObject in try testManagedObjectContext.fetch(request) {
+        testManagedObjectContext.delete(foundObject)
       }
 
       saveCoreData()
@@ -168,11 +160,11 @@ class JadKitTests: XCTestCase {
     }
   }
 
-  private func insertObject(color: UIColor, sectionName: String) {
-    let object = NSEntityDescription.insertNewObjectForEntityForName(TestObject.entityName,
-      inManagedObjectContext: testManagedObjectContext) as! TestObject
+  private func insert(objectWithColor color: UIColor, inSectionName sectionName: String) {
+    let object = NSEntityDescription.insertNewObject(forEntityName: TestObject.entityName,
+      into: testManagedObjectContext) as! TestObject
 
-    object.name = NSUUID().UUIDString
+    object.name = UUID().uuidString
     object.sectionName = sectionName
     object.color = color
   }
@@ -188,14 +180,14 @@ class TestObject: NSManagedObject {
   }
 
   private class var entityDescription: NSEntityDescription {
-    return NSEntityDescription.entityForName(entityName,
-      inManagedObjectContext: testManagedObjectContext)!
+    return NSEntityDescription.entity(forEntityName: entityName,
+      in: testManagedObjectContext)!
   }
 
   convenience init(color: UIColor) {
-    self.init(entity: TestObject.entityDescription, insertIntoManagedObjectContext: nil)
+    self.init(entity: TestObject.entityDescription, insertInto: nil)
 
-    self.name = NSUUID().UUIDString
+    self.name = UUID().uuidString
     self.color = color
   }
 }

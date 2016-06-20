@@ -51,17 +51,17 @@ public protocol NonFetchedList: List {
  */
 public extension NonFetchedList {
   /// The number of sections in the `listData`.
-  var numberOfSections: Int {
+  var sectionCount: Int {
     return listData?.count ?? 0
   }
   
   /**
-   The number of rows in a section of the `listData`.
+   The number of items in a section of the `listData`.
    - parameter section: The section in which the row count will be returned.
-   - returns: The number of rows in a given section. `0` if the section is
+   - returns: The number of items in a given section. `0` if the section is
    not found.
    */
-  func numberOfRowsInSection(section: Int) -> Int {
+  func itemCount(at section: Int) -> Int {
     guard listData != nil && section >= 0 && section < listData!.count else {
       return 0
     }
@@ -77,7 +77,7 @@ public extension NonFetchedList {
    - returns: An optional with the corresponding object at an index
    path or nil if the index path is invalid.
    */
-  func objectAtIndexPath(indexPath: NSIndexPath) -> Object? {
+  func object(at indexPath: IndexPath) -> Object? {
     guard isValidIndexPath(indexPath) else {
       return nil
     }
@@ -91,7 +91,7 @@ public extension NonFetchedList {
    - parameter indexPath: The index path to check for existance.
    - returns: `true` iff the index path is valid for your data source.
    */
-  func isValidIndexPath(indexPath: NSIndexPath) -> Bool {
+  func isValidIndexPath(_ indexPath: IndexPath) -> Bool {
     guard listData != nil && indexPath.section >= 0 && indexPath.section < listData!.count else {
       return false
     }
@@ -118,12 +118,12 @@ public extension TableList where ListView == UITableView, Cell == UITableViewCel
    Method to call in `tableView:cellForRowAtIndexPath:`.
    - parameter indexPath: An index path locating a row in `tableView`
    */
-  func tableCellAtIndexPath(indexPath: NSIndexPath) -> UITableViewCell {
-    let identifier = cellIdentifierForIndexPath(indexPath)
-    let cell = tableView.dequeueReusableCellWithIdentifier(identifier,
-                                                           forIndexPath: indexPath)
+  func cell(at indexPath: IndexPath) -> UITableViewCell {
+    let identifier = cellIdentifier(at: indexPath)
+    let cell = tableView.dequeueReusableCell(withIdentifier: identifier,
+                                                           for: indexPath)
 
-    if let object = objectAtIndexPath(indexPath) {
+    if let object = object(at: indexPath) {
       listView(tableView, configureCell: cell, withObject: object, atIndexPath: indexPath)
     }
 
@@ -134,8 +134,8 @@ public extension TableList where ListView == UITableView, Cell == UITableViewCel
    Method to call in `tableView:didSelectRowAtIndexPath:`.
    - parameter indexPath: An index path locating the new selected row in `tableView`.
    */
-  func tableDidSelectItemAtIndexPath(indexPath: NSIndexPath) {
-    if let object = objectAtIndexPath(indexPath) {
+  func didSelectItem(at indexPath: IndexPath) {
+    if let object = object(at: indexPath) {
       listView(tableView, didSelectObject: object, atIndexPath: indexPath)
     }
   }
@@ -162,13 +162,13 @@ public extension CollectionList where ListView == UICollectionView, Cell == UICo
    Method to call in `collectionView:cellForItemAtIndexPath:`.
    - parameter indexPath: The index path that specifies the location of the item.
    */
-  func collectionCellAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewCell {
-    let identifier = cellIdentifierForIndexPath(indexPath)
+  func cell(at indexPath: IndexPath) -> UICollectionViewCell {
+    let identifier = cellIdentifier(at: indexPath)
 
-    let cell = collectionView!.dequeueReusableCellWithReuseIdentifier(identifier,
-                                                                     forIndexPath: indexPath)
+    let cell = collectionView!.dequeueReusableCell(withReuseIdentifier: identifier,
+                                                                     for: indexPath)
 
-    if let object = objectAtIndexPath(indexPath) {
+    if let object = object(at: indexPath) {
       listView(collectionView!, configureCell: cell, withObject: object, atIndexPath: indexPath)
     }
 
@@ -179,8 +179,8 @@ public extension CollectionList where ListView == UICollectionView, Cell == UICo
    Method to call in `collectionView:didSelectItemAtIndexPath:`.
    - parameter indexPath: The index path of the cell that was selected.
    */
-  func collectionDidSelectItemAtIndexPath(indexPath: NSIndexPath) {
-    if let object = objectAtIndexPath(indexPath) {
+  func didSelectItem(at indexPath: IndexPath) {
+    if let object = object(at: indexPath) {
       listView(collectionView!, didSelectObject: object, atIndexPath: indexPath)
     }
   }

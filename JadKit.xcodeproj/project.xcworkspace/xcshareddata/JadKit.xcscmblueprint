@@ -4,12 +4,12 @@
 
   },
   "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
-    "1689287D7E5D16CAD1352D6486CB894051BA0B4D" : 0,
+    "AE3EE766CF2251BF2DB55AFC933684D6A1209D61" : 0,
     "DCD8B4C85FAF3CF7011628E4F8714C19DFC246CF" : 0
   },
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "A463CBD7-6EC3-44A5-AC6C-2FB44CFA200A",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
-    "1689287D7E5D16CAD1352D6486CB894051BA0B4D" : "",
+    "AE3EE766CF2251BF2DB55AFC933684D6A1209D61" : "",
     "DCD8B4C85FAF3CF7011628E4F8714C19DFC246CF" : "JadKit\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "JadKit",
@@ -19,7 +19,7 @@
     {
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/jad6\/BucketLists",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "1689287D7E5D16CAD1352D6486CB894051BA0B4D"
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "AE3EE766CF2251BF2DB55AFC933684D6A1209D61"
     },
     {
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/jad6\/JadKit.git",

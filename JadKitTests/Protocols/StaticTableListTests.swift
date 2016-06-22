@@ -1,5 +1,5 @@
 //
-//  TableListTests.swift
+//  StaticTableListTests.swift
 //  JadKit
 //
 //  Created by Jad Osseiran on 4/03/2016.
@@ -11,7 +11,7 @@ import XCTest
 
 @testable import JadKit
 
-class TableListTests: JadKitTests {
+class StaticTableListTests: JadKitTests {
   private var tableViewController: TableListViewController!
 
   private var tableView: UITableView {
@@ -70,7 +70,7 @@ class TableListTests: JadKitTests {
   }
 }
 
-private class TableListViewController: UITableViewController, TableList {
+private class TableListViewController: UITableViewController, StaticTableList {
   var listData: [[TestObject]]!
   var selectedCellIndexPaths = [IndexPath]()
 

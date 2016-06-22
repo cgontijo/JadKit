@@ -1,53 +1,53 @@
 //
-//  NonFetchedListTests.swift
+//  DynamicListTests.swift
 //  JadKit
 //
 //  Created by Jad Osseiran on 3/5/16.
 //  Copyright © 2016 Jad Osseiran. All rights reserved.
 //
 
+import CoreData
 import UIKit
 import XCTest
 
 @testable import JadKit
 
-class NonFetchedListTests: JadKitTests, NonFetchedList {
+class DynamicListTests: JadKitTests, DynamicList {
   typealias ListView = UIView
   typealias Cell = UIView
   typealias Object = TestObject
 
-  func testObjectAtValidIndexPaths() {
-    for section in 0..<listData.count {
-      for row in 0..<listData[section].count {
-        if let object = object(at: IndexPath(row: row, section: section)) {
-          XCTAssertEqual(object, listData[section][row])
-        } else {
-          XCTFail()
-        }
-      }
-    }
-  }
-  
-  func testitemCountAndSetions() {
-    XCTAssertEqual(sectionCount, listData.count)
+  override func setUp() {
+    super.setUp()
 
-    for section in 0..<listData.count {
-      XCTAssertEqual(itemCount(at: section), listData[section].count)
+    insertAndSave(numberOfObjects: 10, inSectionName: "First")
+    insertAndSave(numberOfObjects: 5, inSectionName: "Second")
+
+    performFetch()
+  }
+
+  func testitemCountAndSetions() {
+    if let sections = fetchedResultsController.sections {
+      XCTAssertEqual(sectionCount, sections.count)
+
+      for sectionIndex in 0..<sections.count {
+        XCTAssertEqual(itemCount(at: sectionIndex), sections[sectionIndex].numberOfObjects)
+      }
     }
   }
 
   func testValidIndexPath() {
-    XCTAssertTrue(isValidIndexPath(IndexPath(row: 0, section: 1)))
+    XCTAssertTrue(isValid(indexPath: IndexPath(row: 0, section: 1)))
   }
 
   func testInvalidIndexPath() {
-    XCTAssertFalse(isValidIndexPath(IndexPath(row: 1, section: 10)))
+    XCTAssertFalse(isValid(indexPath: IndexPath(row: 1, section: 10)))
   }
 
   func testObjectAtIndexPathSectionTooBig() {
     XCTAssertNil(object(at: IndexPath(row: 0, section: 2)))
   }
-  
+
   func testObjectAtIndexPathSectionTooSmall() {
     XCTAssertNil(object(at: IndexPath(row: 0, section: -1)))
   }
@@ -58,6 +58,16 @@ class NonFetchedListTests: JadKitTests, NonFetchedList {
 
   func testObjectAtIndexPathRowTooSmall() {
     XCTAssertNil(object(at: IndexPath(row: -1, section: 0)))
+  }
+
+  func testValidSectionNames() {
+    XCTAssertEqual(titleForHeader(at: 0), "First")
+    XCTAssertEqual(titleForHeader(at: 1), "Second")
+  }
+
+  func testInvalidSectionNames() {
+    XCTAssertNil(titleForHeader(at: 2))
+    XCTAssertNil(titleForHeader(at: -2))
   }
 
   // MARK: Conformance

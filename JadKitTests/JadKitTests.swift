@@ -31,8 +31,6 @@ private func setUpCoreData() {
 }
 
 private func tearDownCoreData() {
-  testManagedObjectContext.reset()
-
   let fetchRequest = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
 
   do {
@@ -45,6 +43,8 @@ private func tearDownCoreData() {
   }
 
   saveCoreData()
+
+  testManagedObjectContext.reset()
 }
 
 private func saveCoreData() {

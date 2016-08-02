@@ -52,9 +52,9 @@ public class PaddedLabel: UILabel {
   public var padding: UIEdgeInsets {
     var hasText: Bool = false
 
-    if let text = text?.characters.count where text > 0 {
+    if let text = text?.characters.count, text > 0 {
       hasText = true
-    } else if let text = attributedText?.length where text > 0 {
+    } else if let text = attributedText?.length, text > 0 {
       hasText = true
     }
 

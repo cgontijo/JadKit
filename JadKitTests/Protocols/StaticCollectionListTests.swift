@@ -37,9 +37,9 @@ class StaticCollectionListTests: JadKitTests {
   }
 
   func testListRowsAndSections() {
-    XCTAssertEqual(collectionView.numberOfSections(), collectionViewController.sectionCount)
+    XCTAssertEqual(collectionView.numberOfSections, collectionViewController.sectionCount)
 
-    for section in 0..<collectionView.numberOfSections() {
+    for section in 0..<collectionView.numberOfSections {
       XCTAssertEqual(collectionView.numberOfItems(inSection: section),
         collectionViewController.itemCount(at: section))
     }

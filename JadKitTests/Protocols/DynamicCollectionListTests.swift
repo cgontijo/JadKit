@@ -43,9 +43,9 @@ class DynamicStaticCollectionListTests: JadKitTests {
   }
 
   func testListRowsAndSections() {
-    XCTAssertEqual(collectionView.numberOfSections(), collectionViewController.sectionCount)
+    XCTAssertEqual(collectionView.numberOfSections, collectionViewController.sectionCount)
 
-    for section in 0..<collectionView.numberOfSections() {
+    for section in 0..<collectionView.numberOfSections {
       XCTAssertEqual(collectionView.numberOfItems(inSection: section),
                      collectionViewController.itemCount(at: section))
     }
@@ -101,10 +101,10 @@ class DynamicStaticCollectionListTests: JadKitTests {
       return
     }
 
-    XCTAssertNotEqual(objectToUpdate.color, UIColor.cyan())
+    XCTAssertNotEqual(objectToUpdate.color, UIColor.cyan)
 
     updateAndSave(objectWithName: objectToUpdate.name) { object in
-      object.color = UIColor.cyan()
+      object.color = UIColor.cyan
     }
 
     guard let updatedObject = collectionViewController.object(at: updateIndexPath) else {
@@ -112,7 +112,7 @@ class DynamicStaticCollectionListTests: JadKitTests {
       return
     }
 
-    XCTAssertEqual(updatedObject.color, UIColor.cyan())
+    XCTAssertEqual(updatedObject.color, UIColor.cyan)
   }
 
   func testDeletingRow() {

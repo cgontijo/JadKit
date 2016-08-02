@@ -94,7 +94,7 @@ class DynamicStaticTableListTests: JadKitTests {
       return
     }
 
-    XCTAssertNotEqual(objectToUpdate.color, UIColor.cyan())
+    XCTAssertNotEqual(objectToUpdate.color, UIColor.cyan)
 
     updateAndSave(objectWithName: objectToUpdate.name) { object in
       object.color = #colorLiteral(red: 0.1431525946, green: 0.4145618975, blue: 0.7041897774, alpha: 1)

@@ -62,6 +62,15 @@ public class PaddedLabel: UILabel {
                                   bottom: inset.height, right: inset.width) : UIEdgeInsets()
   }
 
+  public override var intrinsicContentSize: CGSize {
+    let superContentSize = super.intrinsicContentSize
+
+    let width = superContentSize.width + padding.left + padding.right
+    let heigth = superContentSize.height + padding.top + padding.bottom
+
+    return CGSize(width: width, height: heigth)
+  }
+
   public override func drawText(in rect: CGRect) {
     super.drawText(in: UIEdgeInsetsInsetRect(rect, padding))
   }
@@ -89,15 +98,6 @@ public class PaddedLabel: UILabel {
       }
       
       return rect
-  }
-
-  public override func intrinsicContentSize() -> CGSize {
-    let superContentSize = super.intrinsicContentSize()
-
-    let width = superContentSize.width + padding.left + padding.right
-    let heigth = superContentSize.height + padding.top + padding.bottom
-
-    return CGSize(width: width, height: heigth)
   }
 
   public override func sizeThatFits(_ size: CGSize) -> CGSize {

@@ -65,12 +65,12 @@ class JadKitTests: XCTestCase {
 
     setUpCoreData()
 
-    listData = [[TestObject(color: UIColor.blue()), TestObject(color: UIColor.white()),
-      TestObject(color: UIColor.red())], [TestObject(color: UIColor.black())]]
+    listData = [[TestObject(color: UIColor.blue), TestObject(color: UIColor.white),
+      TestObject(color: UIColor.red)], [TestObject(color: UIColor.black)]]
 
     let fetchRequest = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
-    fetchRequest.sortDescriptors = [SortDescriptor(key: "sectionName", ascending: true)]
-    fetchRequest.predicate = Predicate(value: true)
+    fetchRequest.sortDescriptors = [NSSortDescriptor(key: "sectionName", ascending: true)]
+    fetchRequest.predicate = NSPredicate(value: true)
 
     fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
       managedObjectContext: testManagedObjectContext, sectionNameKeyPath: "sectionName",
@@ -123,7 +123,7 @@ class JadKitTests: XCTestCase {
 
   func updateAndSave(objectWithName name: String, updateClosure: (object: TestObject) -> Void) {
       let request = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
-      request.predicate = Predicate(format: "name == %@", name)
+      request.predicate = NSPredicate(format: "name == %@", name)
 
       do {
         guard let foundObject = try testManagedObjectContext.fetch(request).first else {
@@ -147,7 +147,7 @@ class JadKitTests: XCTestCase {
 
   func deleteAndSave(sectionWithName sectionName: String) {
     let request = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
-    request.predicate = Predicate(format: "sectionName == %@", sectionName)
+    request.predicate = NSPredicate(format: "sectionName == %@", sectionName)
 
     do {
       for foundObject in try testManagedObjectContext.fetch(request) {

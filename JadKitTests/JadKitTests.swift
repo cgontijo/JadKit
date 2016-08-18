@@ -121,7 +121,7 @@ class JadKitTests: XCTestCase {
     saveCoreData()
   }
 
-  func updateAndSave(objectWithName name: String, updateClosure: (object: TestObject) -> Void) {
+  func updateAndSave(objectWithName name: String, updateClosure: (_ testObject: TestObject) -> Void) {
       let request = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
       request.predicate = NSPredicate(format: "name == %@", name)
 
@@ -132,7 +132,7 @@ class JadKitTests: XCTestCase {
         }
 
         // Let the updater do its thing.
-        updateClosure(object: foundObject)
+        updateClosure(foundObject)
         // Save after the update.
         saveCoreData()
       } catch let error {
@@ -175,11 +175,11 @@ class TestObject: NSManagedObject {
   @NSManaged var color: UIColor
   @NSManaged var sectionName: String?
 
-  private class var entityName: String {
+  fileprivate class var entityName: String {
     return "TestObject"
   }
 
-  private class var entityDescription: NSEntityDescription {
+  fileprivate class var entityDescription: NSEntityDescription {
     return NSEntityDescription.entity(forEntityName: entityName,
       in: testManagedObjectContext)!
   }

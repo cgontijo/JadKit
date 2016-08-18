@@ -215,7 +215,7 @@ private class DynamicCollectionListViewController: UICollectionViewController, D
   }
 
   @objc func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
-                        didChange anObject: AnyObject, at indexPath: IndexPath?,
+                        didChange anObject: Any, at indexPath: IndexPath?,
                         for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
     didChangeObject(at: indexPath, withChangeType: type, newIndexPath: newIndexPath)
   }

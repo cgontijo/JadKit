@@ -1,5 +1,5 @@
 //
-//  FetchedTableListTests.swift
+//  DynamicStaticTableListTests.swift
 //  JadKit
 //
 //  Created by Jad Osseiran on 3/6/16.
@@ -12,9 +12,8 @@ import XCTest
 
 @testable import JadKit
 
-/*
-class FetchedTableListTests: JadKitTests {
-  private var tableViewController: FetchedTableListViewController!
+class DynamicStaticTableListTests: JadKitTests {
+  private var tableViewController: DynamicTableListViewController!
 
   private var tableView: UITableView {
     return tableViewController.tableView
@@ -23,7 +22,7 @@ class FetchedTableListTests: JadKitTests {
   override func setUp() {
     super.setUp()
 
-    tableViewController = FetchedTableListViewController(style: .plain)
+    tableViewController = DynamicTableListViewController(style: .plain)
     tableViewController.fetchedResultsController = fetchedResultsController
 
     tableView.register(UITableViewCell.self, forCellReuseIdentifier: testReuseIdentifier)
@@ -46,7 +45,7 @@ class FetchedTableListTests: JadKitTests {
 
     for section in 0..<tableView.numberOfSections {
       XCTAssertEqual(tableView.numberOfRows(inSection: section),
-        tableViewController.itemCount(at: section))
+                     tableViewController.itemCount(at: section))
     }
   }
 
@@ -56,7 +55,7 @@ class FetchedTableListTests: JadKitTests {
       for row in 0..<tableViewController.tableView(tableView, numberOfRowsInSection: section) {
         let indexPath = IndexPath(row: row, section: section)
         let cell = tableViewController.tableView(tableView,
-          cellForRowAt: indexPath)
+                                                 cellForRowAt: indexPath)
 
         if let testObject = tableViewController.object(at: indexPath) {
           XCTAssertEqual(cell.textLabel!.text, testObject.name)
@@ -82,45 +81,42 @@ class FetchedTableListTests: JadKitTests {
 
   func testAddingRow() {
     let numRowsBeforeAdd = tableViewController.itemCount(at: 0)
-    
-    addAndSaveObject(UIColor.cyan(), sectionName: "First")
+
+    addAndSave(objectWithColor: #colorLiteral(red: 0.1431525946, green: 0.4145618975, blue: 0.7041897774, alpha: 1), inSectionName: "First")
     XCTAssertEqual(numRowsBeforeAdd + 1, tableViewController.itemCount(at: 0))
   }
 
   func testUpdatingRow() {
     let updateIndexPath = IndexPath(row: 0, section: 0)
 
-    guard let objectToUpdate = tableViewController.object(at: updateIndexPath)
-      as? TestObject else {
-        XCTFail()
-        return
+    guard let objectToUpdate = tableViewController.object(at: updateIndexPath) else {
+      XCTFail()
+      return
     }
 
-    XCTAssertNotEqual(objectToUpdate.color, UIColor.cyan())
+    XCTAssertNotEqual(objectToUpdate.color, UIColor.cyan)
 
-    updateAndSaveObject(forName: objectToUpdate.name) { object in
-      object.color = UIColor.cyan()
+    updateAndSave(objectWithName: objectToUpdate.name) { object in
+      object.color = #colorLiteral(red: 0.1431525946, green: 0.4145618975, blue: 0.7041897774, alpha: 1)
     }
 
-    guard let updatedObject = tableViewController.object(at: updateIndexPath)
-      as? TestObject else {
-        XCTFail()
-        return
+    guard let updatedObject = tableViewController.object(at: updateIndexPath) else {
+      XCTFail()
+      return
     }
 
-    XCTAssertEqual(updatedObject.color, UIColor.cyan())
+    XCTAssertEqual(updatedObject.color, #colorLiteral(red: 0.1431525946, green: 0.4145618975, blue: 0.7041897774, alpha: 1))
   }
 
   func testDeletingRow() {
     let numRowsBeforeDelete = tableViewController.itemCount(at: 0)
 
-    guard let objectToDelete = tableViewController.object(at: IndexPath(row: 0, section: 0))
-      as? TestObject else {
-        XCTFail()
-        return
+    guard let objectToDelete = tableViewController.object(at: IndexPath(row: 0, section: 0)) else {
+      XCTFail()
+      return
     }
 
-    deleteAndSaveObject(objectToDelete)
+    deleteAndSave(object: objectToDelete)
     XCTAssertEqual(numRowsBeforeDelete - 1, tableViewController.itemCount(at: 0))
   }
 
@@ -128,13 +124,12 @@ class FetchedTableListTests: JadKitTests {
     let numRowsInSectionOneBeforeMove = tableViewController.itemCount(at: 0)
     let numRowsInSectionTwoBeforeMove = tableViewController.itemCount(at: 1)
 
-    guard let objectToMove = tableViewController.object(at: IndexPath(row: 0, section: 0))
-      as? TestObject else {
-        XCTFail()
-        return
+    guard let objectToMove = tableViewController.object(at: IndexPath(row: 0, section: 0)) else {
+      XCTFail()
+      return
     }
 
-    updateAndSaveObject(forName: objectToMove.name) { object in
+    updateAndSave(objectWithName: objectToMove.name) { object in
       object.sectionName = "Second"
     }
 
@@ -151,14 +146,13 @@ class FetchedTableListTests: JadKitTests {
   }
 
   func testDeletingSection() {
-    let numSectionsBeforeDelete = tableViewController.numberOfSections
-    deleteAndSaveSection("First")
-    XCTAssertEqual(numSectionsBeforeDelete - 1, tableViewController.numberOfSections)
+    let numSectionsBeforeDelete = tableViewController.sectionCount
+    deleteAndSave(sectionWithName: "First")
+    XCTAssertEqual(numSectionsBeforeDelete - 1, tableViewController.sectionCount)
   }
 }
- */
 
-private class FetchedTableListViewController: UITableViewController, FetchedTableList {
+private class DynamicTableListViewController: UITableViewController, DynamicTableList {
   var fetchedResultsController: NSFetchedResultsController<TestObject>! {
     didSet {
       fetchedResultsController.delegate = self
@@ -171,16 +165,13 @@ private class FetchedTableListViewController: UITableViewController, FetchedTabl
     return testReuseIdentifier
   }
 
-  func listView(_ listView: UITableView, configureCell cell: UITableViewCell,
-    withObject object: AnyObject, atIndexPath indexPath: IndexPath) {
-      if let testObject = object as? TestObject {
-        cell.textLabel?.text = testObject.name
-      }
+  func listView(_ listView: UITableView, configureCell cell: UITableViewCell, withObject object: TestObject,
+                atIndexPath indexPath: IndexPath) {
+    cell.textLabel?.text = object.name
   }
 
-  func listView(_ listView: UITableView, didSelectObject object: AnyObject,
-    atIndexPath indexPath: IndexPath) {
-      selectedCellIndexPaths.append(indexPath)
+  func listView(_ listView: UITableView, didSelectObject object: TestObject, atIndexPath indexPath: IndexPath) {
+    selectedCellIndexPaths.append(indexPath)
   }
 
   // MARK: Table View
@@ -193,9 +184,8 @@ private class FetchedTableListViewController: UITableViewController, FetchedTabl
     return itemCount(at: section)
   }
 
-  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath)
-    -> UITableViewCell {
-      return cell(at: indexPath)
+  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    return cell(at: indexPath)
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -209,15 +199,15 @@ private class FetchedTableListViewController: UITableViewController, FetchedTabl
   }
 
   @objc func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
-    didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int,
-    for type: NSFetchedResultsChangeType) {
-      didChangeSection(sectionIndex, withChangeType: type)
+                        didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int,
+                        for type: NSFetchedResultsChangeType) {
+    didChangeSection(sectionIndex, withChangeType: type)
   }
 
   @objc func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
-    didChange anObject: AnyObject, at indexPath: IndexPath?,
-    for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-      didChangeObject(at: indexPath, withChangeType: type, newIndexPath: newIndexPath)
+                        didChange anObject: Any, at indexPath: IndexPath?,
+                        for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+    didChangeObject(at: indexPath, withChangeType: type, newIndexPath: newIndexPath)
   }
 
   @objc func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {

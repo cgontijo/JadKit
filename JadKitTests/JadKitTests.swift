@@ -31,8 +31,6 @@ private func setUpCoreData() {
 }
 
 private func tearDownCoreData() {
-  testManagedObjectContext.reset()
-
   let fetchRequest = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
 
   do {
@@ -45,6 +43,8 @@ private func tearDownCoreData() {
   }
 
   saveCoreData()
+
+  testManagedObjectContext.reset()
 }
 
 private func saveCoreData() {
@@ -65,12 +65,12 @@ class JadKitTests: XCTestCase {
 
     setUpCoreData()
 
-    listData = [[TestObject(color: UIColor.blue()), TestObject(color: UIColor.white()),
-      TestObject(color: UIColor.red())], [TestObject(color: UIColor.black())]]
+    listData = [[TestObject(color: UIColor.blue), TestObject(color: UIColor.white),
+      TestObject(color: UIColor.red)], [TestObject(color: UIColor.black)]]
 
     let fetchRequest = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
-    fetchRequest.sortDescriptors = [SortDescriptor(key: "sectionName", ascending: true)]
-    fetchRequest.predicate = Predicate(value: true)
+    fetchRequest.sortDescriptors = [NSSortDescriptor(key: "sectionName", ascending: true)]
+    fetchRequest.predicate = NSPredicate(value: true)
 
     fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
       managedObjectContext: testManagedObjectContext, sectionNameKeyPath: "sectionName",
@@ -121,9 +121,9 @@ class JadKitTests: XCTestCase {
     saveCoreData()
   }
 
-  func updateAndSave(objectWithName name: String, updateClosure: (object: TestObject) -> Void) {
+  func updateAndSave(objectWithName name: String, updateClosure: (_ testObject: TestObject) -> Void) {
       let request = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
-      request.predicate = Predicate(format: "name == %@", name)
+      request.predicate = NSPredicate(format: "name == %@", name)
 
       do {
         guard let foundObject = try testManagedObjectContext.fetch(request).first else {
@@ -132,7 +132,7 @@ class JadKitTests: XCTestCase {
         }
 
         // Let the updater do its thing.
-        updateClosure(object: foundObject)
+        updateClosure(foundObject)
         // Save after the update.
         saveCoreData()
       } catch let error {
@@ -147,7 +147,7 @@ class JadKitTests: XCTestCase {
 
   func deleteAndSave(sectionWithName sectionName: String) {
     let request = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
-    request.predicate = Predicate(format: "sectionName == %@", sectionName)
+    request.predicate = NSPredicate(format: "sectionName == %@", sectionName)
 
     do {
       for foundObject in try testManagedObjectContext.fetch(request) {
@@ -175,11 +175,11 @@ class TestObject: NSManagedObject {
   @NSManaged var color: UIColor
   @NSManaged var sectionName: String?
 
-  private class var entityName: String {
+  fileprivate class var entityName: String {
     return "TestObject"
   }
 
-  private class var entityDescription: NSEntityDescription {
+  fileprivate class var entityDescription: NSEntityDescription {
     return NSEntityDescription.entity(forEntityName: entityName,
       in: testManagedObjectContext)!
   }

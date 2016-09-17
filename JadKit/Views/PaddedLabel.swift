@@ -52,14 +52,23 @@ public class PaddedLabel: UILabel {
   public var padding: UIEdgeInsets {
     var hasText: Bool = false
 
-    if let text = text?.characters.count where text > 0 {
+    if let text = text?.characters.count, text > 0 {
       hasText = true
-    } else if let text = attributedText?.length where text > 0 {
+    } else if let text = attributedText?.length, text > 0 {
       hasText = true
     }
 
     return hasText ? UIEdgeInsets(top: inset.height, left: inset.width,
                                   bottom: inset.height, right: inset.width) : UIEdgeInsets()
+  }
+
+  public override var intrinsicContentSize: CGSize {
+    let superContentSize = super.intrinsicContentSize
+
+    let width = superContentSize.width + padding.left + padding.right
+    let heigth = superContentSize.height + padding.top + padding.bottom
+
+    return CGSize(width: width, height: heigth)
   }
 
   public override func drawText(in rect: CGRect) {
@@ -89,15 +98,6 @@ public class PaddedLabel: UILabel {
       }
       
       return rect
-  }
-
-  public override func intrinsicContentSize() -> CGSize {
-    let superContentSize = super.intrinsicContentSize()
-
-    let width = superContentSize.width + padding.left + padding.right
-    let heigth = superContentSize.height + padding.top + padding.bottom
-
-    return CGSize(width: width, height: heigth)
   }
 
   public override func sizeThatFits(_ size: CGSize) -> CGSize {

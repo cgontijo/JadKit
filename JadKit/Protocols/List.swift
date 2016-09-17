@@ -39,7 +39,7 @@ import UIKit
 /**
  This protocol outlines the most basic bhaviour that a list should implement.
  */
-public protocol List {
+public protocol List: class {
   /// The list view for the list (i.e. `UITableView`).
   associatedtype ListView
   /// The list cell view (i.e. `UITableViewCell`).

@@ -1,5 +1,5 @@
 //
-//  CollectionListTests.swift
+//  StaticCollectionListTests.swift
 //  JadKit
 //
 //  Created by Jad Osseiran on 3/4/16.
@@ -11,7 +11,7 @@ import XCTest
 
 @testable import JadKit
 
-class CollectionListTests: JadKitTests {
+class StaticCollectionListTests: JadKitTests {
   private var collectionViewController: CollectionListViewController!
 
   private var collectionView: UICollectionView {
@@ -37,9 +37,9 @@ class CollectionListTests: JadKitTests {
   }
 
   func testListRowsAndSections() {
-    XCTAssertEqual(collectionView.numberOfSections(), collectionViewController.sectionCount)
+    XCTAssertEqual(collectionView.numberOfSections, collectionViewController.sectionCount)
 
-    for section in 0..<collectionView.numberOfSections() {
+    for section in 0..<collectionView.numberOfSections {
       XCTAssertEqual(collectionView.numberOfItems(inSection: section),
         collectionViewController.itemCount(at: section))
     }
@@ -74,7 +74,7 @@ class CollectionListTests: JadKitTests {
   }
 }
 
-private class CollectionListViewController: UICollectionViewController, CollectionList {
+private class CollectionListViewController: UICollectionViewController, StaticCollectionList {
   var listData: [[TestObject]]!
   var selectedCellIndexPaths = [IndexPath]()
 

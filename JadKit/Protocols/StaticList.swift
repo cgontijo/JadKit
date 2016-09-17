@@ -1,5 +1,5 @@
 //
-//  NonFetchedList.swift
+//  StaticList.swift
 //  JadKit
 //
 //  Created by Jad Osseiran on 7/25/15.
@@ -40,7 +40,7 @@ import Foundation
  The basic beahviour that a non fetched list needs to implement. This is
  rather basic, as all a non-fetched list really needs is a data source.
  */
-public protocol NonFetchedList: List {
+public protocol StaticList: List {
   /// The list data used to populate the list. This an array  to
   /// populate the rows. Currently this is limited to a single section.
   var listData: [[Object]]! { get set }
@@ -49,19 +49,19 @@ public protocol NonFetchedList: List {
 /**
  Protocol extension to implement the basic non fetched list methods.
  */
-public extension NonFetchedList {
+public extension StaticList {
   /// The number of sections in the `listData`.
-  var numberOfSections: Int {
+  var sectionCount: Int {
     return listData?.count ?? 0
   }
   
   /**
-   The number of rows in a section of the `listData`.
+   The number of items in a section of the `listData`.
    - parameter section: The section in which the row count will be returned.
-   - returns: The number of rows in a given section. `0` if the section is
+   - returns: The number of items in a given section. `0` if the section is
    not found.
    */
-  func numberOfRowsInSection(section: Int) -> Int {
+  func itemCount(at section: Int) -> Int {
     guard listData != nil && section >= 0 && section < listData!.count else {
       return 0
     }
@@ -72,13 +72,13 @@ public extension NonFetchedList {
    Convenient helper method to find the object at a given index path.
    This method works well with `isValidIndexPath:`.
    - note: This method is implemented by a protocol extension if the object
-   conforms to either `FetchedList` or `NonFetchedList`
+   conforms to either `DynamicList` or `StaticList`
    - parameter indexPath: The index path to retreive the object for.
    - returns: An optional with the corresponding object at an index
    path or nil if the index path is invalid.
    */
-  func objectAtIndexPath(indexPath: NSIndexPath) -> Object? {
-    guard isValidIndexPath(indexPath) else {
+  func object(at indexPath: IndexPath) -> Object? {
+    guard isValid(indexPath: indexPath) else {
       return nil
     }
     return listData?[indexPath.section][indexPath.row]
@@ -87,11 +87,11 @@ public extension NonFetchedList {
   /**
    Conveneient helper method to ensure that a given index path is valid.
    - note: This method is implemented by a protocol extension if the object
-   conforms to either `FetchedList` or `NonFetchedList`
+   conforms to either `DynamicList` or `StaticList`
    - parameter indexPath: The index path to check for existance.
    - returns: `true` iff the index path is valid for your data source.
    */
-  func isValidIndexPath(indexPath: NSIndexPath) -> Bool {
+  func isValid(indexPath: IndexPath) -> Bool {
     guard listData != nil && indexPath.section >= 0 && indexPath.section < listData!.count else {
       return false
     }
@@ -105,7 +105,7 @@ public extension NonFetchedList {
  Empty protocol to set up the conformance to the various protocols to allow
  for a valid table view protocol extension implementation.
  */
-public protocol TableList: NonFetchedList, UITableViewDataSource, UITableViewDelegate {
+public protocol StaticTableList: StaticList, UITableViewDataSource, UITableViewDelegate {
   /// The table view that will present the data.
   var tableView: UITableView! { get set }
 }
@@ -113,17 +113,17 @@ public protocol TableList: NonFetchedList, UITableViewDataSource, UITableViewDel
 /**
  Protocol extension to implement the table view delegate & data source methods.
  */
-public extension TableList where ListView == UITableView, Cell == UITableViewCell {
+public extension StaticTableList where ListView == UITableView, Cell == UITableViewCell {
   /**
    Method to call in `tableView:cellForRowAtIndexPath:`.
    - parameter indexPath: An index path locating a row in `tableView`
    */
-  func tableCellAtIndexPath(indexPath: NSIndexPath) -> UITableViewCell {
-    let identifier = cellIdentifierForIndexPath(indexPath)
-    let cell = tableView.dequeueReusableCellWithIdentifier(identifier,
-                                                           forIndexPath: indexPath)
+  func cell(at indexPath: IndexPath) -> UITableViewCell {
+    let identifier = cellIdentifier(at: indexPath)
+    let cell = tableView.dequeueReusableCell(withIdentifier: identifier,
+                                                           for: indexPath)
 
-    if let object = objectAtIndexPath(indexPath) {
+    if let object = object(at: indexPath) {
       listView(tableView, configureCell: cell, withObject: object, atIndexPath: indexPath)
     }
 
@@ -134,8 +134,8 @@ public extension TableList where ListView == UITableView, Cell == UITableViewCel
    Method to call in `tableView:didSelectRowAtIndexPath:`.
    - parameter indexPath: An index path locating the new selected row in `tableView`.
    */
-  func tableDidSelectItemAtIndexPath(indexPath: NSIndexPath) {
-    if let object = objectAtIndexPath(indexPath) {
+  func didSelectItem(at indexPath: IndexPath) {
+    if let object = object(at: indexPath) {
       listView(tableView, didSelectObject: object, atIndexPath: indexPath)
     }
   }
@@ -147,7 +147,7 @@ public extension TableList where ListView == UITableView, Cell == UITableViewCel
  Empty protocol to set up the conformance to the various protocols to allow
  for a valid collection view protocol extension implementation.
  */
-public protocol CollectionList: NonFetchedList, UICollectionViewDataSource,
+public protocol StaticCollectionList: StaticList, UICollectionViewDataSource,
   UICollectionViewDelegate {
     /// The collection view that will present the data.
     var collectionView: UICollectionView? { get set }
@@ -157,18 +157,18 @@ public protocol CollectionList: NonFetchedList, UICollectionViewDataSource,
  Protocol extension to implement the collection view delegate & data
  source methods.
  */
-public extension CollectionList where ListView == UICollectionView, Cell == UICollectionViewCell {
+public extension StaticCollectionList where ListView == UICollectionView, Cell == UICollectionViewCell {
   /**
    Method to call in `collectionView:cellForItemAtIndexPath:`.
    - parameter indexPath: The index path that specifies the location of the item.
    */
-  func collectionCellAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewCell {
-    let identifier = cellIdentifierForIndexPath(indexPath)
+  func cell(at indexPath: IndexPath) -> UICollectionViewCell {
+    let identifier = cellIdentifier(at: indexPath)
 
-    let cell = collectionView!.dequeueReusableCellWithReuseIdentifier(identifier,
-                                                                     forIndexPath: indexPath)
+    let cell = collectionView!.dequeueReusableCell(withReuseIdentifier: identifier,
+                                                                     for: indexPath)
 
-    if let object = objectAtIndexPath(indexPath) {
+    if let object = object(at: indexPath) {
       listView(collectionView!, configureCell: cell, withObject: object, atIndexPath: indexPath)
     }
 
@@ -179,8 +179,8 @@ public extension CollectionList where ListView == UICollectionView, Cell == UICo
    Method to call in `collectionView:didSelectItemAtIndexPath:`.
    - parameter indexPath: The index path of the cell that was selected.
    */
-  func collectionDidSelectItemAtIndexPath(indexPath: NSIndexPath) {
-    if let object = objectAtIndexPath(indexPath) {
+  func didSelectItem(at indexPath: IndexPath) {
+    if let object = object(at: indexPath) {
       listView(collectionView!, didSelectObject: object, atIndexPath: indexPath)
     }
   }

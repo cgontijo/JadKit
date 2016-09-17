@@ -39,7 +39,7 @@ import UIKit
 /**
  This protocol outlines the most basic bhaviour that a list should implement.
  */
-public protocol List {
+public protocol List: class {
   /// The list view for the list (i.e. `UITableView`).
   associatedtype ListView
   /// The list cell view (i.e. `UITableViewCell`).
@@ -52,7 +52,7 @@ public protocol List {
    - parameter indexPath: The index path of the cell.
    - returns: The cell identifier.
    */
-  func cellIdentifierForIndexPath(indexPath: NSIndexPath) -> String
+  func cellIdentifier(at indexPath: IndexPath) -> String
 
   /**
    Helper method to configure a cell at the given index path with a given
@@ -62,8 +62,8 @@ public protocol List {
    - parameter object: The object which matches the cell's index path.
    - parameter indexPath: The index path of the cell to configure.
    */
-  func listView(listView: ListView, configureCell cell: Cell, withObject object: Object,
-                atIndexPath indexPath: NSIndexPath)
+  func listView(_ listView: ListView, configureCell cell: Cell, withObject object: Object,
+                atIndexPath indexPath: IndexPath)
 
   /**
    Called when the user selects a cell at the given index path.
@@ -71,6 +71,6 @@ public protocol List {
    - parameter object: The object at the selected index path.
    - parameter indexPath: The index path of the cell which was selected.
    */
-  func listView(listView: ListView, didSelectObject object: Object,
-                atIndexPath indexPath: NSIndexPath)
+  func listView(_ listView: ListView, didSelectObject object: Object,
+                atIndexPath indexPath: IndexPath)
 }

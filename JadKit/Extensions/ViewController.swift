@@ -37,7 +37,7 @@ import UIKit
 
 public extension UIViewController {
   /// Whether the view controller was presented modally or not.
-  public var modal: Bool {
+  public var isModal: Bool {
     if self.presentingViewController?.presentedViewController == self {
       return true
     }

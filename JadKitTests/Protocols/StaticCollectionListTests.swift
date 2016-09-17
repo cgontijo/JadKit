@@ -1,5 +1,5 @@
 //
-//  CollectionListTests.swift
+//  StaticCollectionListTests.swift
 //  JadKit
 //
 //  Created by Jad Osseiran on 3/4/16.
@@ -11,7 +11,7 @@ import XCTest
 
 @testable import JadKit
 
-class CollectionListTests: JadKitTests {
+class StaticCollectionListTests: JadKitTests {
   private var collectionViewController: CollectionListViewController!
 
   private var collectionView: UICollectionView {
@@ -25,7 +25,7 @@ class CollectionListTests: JadKitTests {
       collectionViewLayout: UICollectionViewFlowLayout())
     collectionViewController.listData = listData
 
-    collectionView.registerClass(UICollectionViewCell.self,
+    collectionView.register(UICollectionViewCell.self,
       forCellWithReuseIdentifier: testReuseIdentifier)
   }
 
@@ -37,21 +37,21 @@ class CollectionListTests: JadKitTests {
   }
 
   func testListRowsAndSections() {
-    XCTAssertEqual(collectionView.numberOfSections(), collectionViewController.numberOfSections)
+    XCTAssertEqual(collectionView.numberOfSections, collectionViewController.sectionCount)
 
-    for section in 0..<collectionView.numberOfSections() {
-      XCTAssertEqual(collectionView.numberOfItemsInSection(section),
-        collectionViewController.numberOfRowsInSection(section))
+    for section in 0..<collectionView.numberOfSections {
+      XCTAssertEqual(collectionView.numberOfItems(inSection: section),
+        collectionViewController.itemCount(at: section))
     }
   }
 
   func testDequeueCells() {
     // Mimic-ish what a UICollectionViewController would do
-    for section in 0..<collectionViewController.numberOfSectionsInCollectionView(collectionView) {
+    for section in 0..<collectionViewController.numberOfSections(in: collectionView) {
       for row in 0..<collectionViewController.collectionView(collectionView,
         numberOfItemsInSection: section) {
           let cell = collectionViewController.collectionView(collectionView,
-            cellForItemAtIndexPath: NSIndexPath(forRow: row, inSection: section))
+            cellForItemAt: IndexPath(row: row, section: section))
 
           // Make sure that through the protocol extensions we didn't mess up the ordering.
           XCTAssertEqual(cell.backgroundColor, listData[section][row].color)
@@ -61,55 +61,55 @@ class CollectionListTests: JadKitTests {
 
   func testSelectCells() {
     // Mimic-ish what a UICollectionViewController would do
-    for section in 0..<collectionViewController.numberOfSectionsInCollectionView(collectionView) {
+    for section in 0..<collectionViewController.numberOfSections(in: collectionView) {
       for row in 0..<collectionViewController.collectionView(collectionView,
         numberOfItemsInSection: section) {
-          let indexPath = NSIndexPath(forRow: row, inSection: section)
+          let indexPath = IndexPath(row: row, section: section)
 
           XCTAssertFalse(collectionViewController.selectedCellIndexPaths.contains(indexPath))
-          collectionViewController.collectionView(collectionView, didSelectItemAtIndexPath: indexPath)
+          collectionViewController.collectionView(collectionView, didSelectItemAt: indexPath)
           XCTAssertTrue(collectionViewController.selectedCellIndexPaths.contains(indexPath))
       }
     }
   }
 }
 
-private class CollectionListViewController: UICollectionViewController, CollectionList {
+private class CollectionListViewController: UICollectionViewController, StaticCollectionList {
   var listData: [[TestObject]]!
-  var selectedCellIndexPaths = [NSIndexPath]()
+  var selectedCellIndexPaths = [IndexPath]()
 
-  func cellIdentifierForIndexPath(indexPath: NSIndexPath) -> String {
+  func cellIdentifier(at: IndexPath) -> String {
     return testReuseIdentifier
   }
 
-  func listView(listView: UICollectionView, configureCell cell: UICollectionViewCell,
-    withObject object: TestObject, atIndexPath indexPath: NSIndexPath) {
+  func listView(_ listView: UICollectionView, configureCell cell: UICollectionViewCell,
+    withObject object: TestObject, atIndexPath indexPath: IndexPath) {
       cell.backgroundColor = object.color
   }
 
-  func listView(listView: UICollectionView, didSelectObject object: TestObject,
-    atIndexPath indexPath: NSIndexPath) {
+  func listView(_ listView: UICollectionView, didSelectObject object: TestObject,
+    atIndexPath indexPath: IndexPath) {
       selectedCellIndexPaths.append(indexPath)
   }
 
   // MARK: Collection View
 
-  override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
-    return numberOfSections
+  override func numberOfSections(in collectionView: UICollectionView) -> Int {
+    return sectionCount
   }
 
-  override func collectionView(collectionView: UICollectionView,
+  override func collectionView(_ collectionView: UICollectionView,
     numberOfItemsInSection section: Int) -> Int {
-      return numberOfRowsInSection(section)
+      return itemCount(at: section)
   }
 
-  override func collectionView(collectionView: UICollectionView,
-    cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-      return collectionCellAtIndexPath(indexPath)
+  override func collectionView(_ collectionView: UICollectionView,
+    cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+      return cell(at: indexPath)
   }
 
-  override func collectionView(collectionView: UICollectionView,
-    didSelectItemAtIndexPath indexPath: NSIndexPath) {
-      collectionDidSelectItemAtIndexPath(indexPath)
+  override func collectionView(_ collectionView: UICollectionView,
+    didSelectItemAt indexPath: IndexPath) {
+      didSelectItem(at: indexPath)
   }
 }

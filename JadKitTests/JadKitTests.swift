@@ -121,7 +121,7 @@ class JadKitTests: XCTestCase {
     saveCoreData()
   }
 
-  func updateAndSave(objectWithName name: String, updateClosure: (_ testObject: TestObject) -> Void) {
+  func updateAndSave(objectWithName name: String, updateClosure: (TestObject) -> Void) {
       let request = NSFetchRequest<TestObject>(entityName: TestObject.entityName)
       request.predicate = NSPredicate(format: "name == %@", name)
 
